@@ -5,6 +5,10 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ./src
+      FASTAPI_URL: http://localhost:8000
+
     steps:
       - uses: actions/checkout@v4
 
@@ -28,7 +32,6 @@ jobs:
 
       - name: Levantar Uvicorn y esperar API
         run: |
-          export PYTHONPATH="${PYTHONPATH}:./src"
           uvicorn src.main:app --port 8000 --host 0.0.0.0 &
           # Esperar a que la API responda
           for i in {1..15}; do
@@ -40,11 +43,10 @@ jobs:
               sleep 2
             fi
           done
+
       - name: Ejecutar pruebas unitarias
         run: |
           pytest tests/test_api.py --cov=src --cov-report=xml
-        env:
-          FASTAPI_ENV: test
 
       - name: Ejecutar pruebas funcionales
         run: |
