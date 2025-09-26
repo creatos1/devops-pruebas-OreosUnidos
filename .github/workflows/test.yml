@@ -26,11 +26,11 @@ jobs:
       - name: Instalar Newman
         run: npm install -g newman
 
-      - name: Ejecutar pruebas unitarias
+      - name: Levantar Uvicorn y esperar API
         run: |
           export PYTHONPATH="${PYTHONPATH}:./src"
           uvicorn src.main:app --port 8000 --host 0.0.0.0 &
-          # Esperar a que la API esté disponible
+          # Esperar a que la API responda
           for i in {1..15}; do
             if curl -s http://localhost:8000/; then
               echo "API lista"
@@ -40,24 +40,13 @@ jobs:
               sleep 2
             fi
           done
+      - name: Ejecutar pruebas unitarias
+        run: |
           pytest tests/test_api.py --cov=src --cov-report=xml
         env:
           FASTAPI_ENV: test
 
       - name: Ejecutar pruebas funcionales
         run: |
-          export PYTHONPATH="${PYTHONPATH}:./src"
-          uvicorn src.main:app --port 8000 --host 0.0.0.0 &
-          # Esperar a que la API esté disponible
-          for i in {1..15}; do
-            if curl -s http://localhost:8000/; then
-              echo "API lista"
-              break
-            else
-              echo "Esperando API..."
-              sleep 2
-            fi
-          done
-          newman run tests/api/test_api.postman_collection.json --reporters cli
-        env:
-          FASTAPI_URL: "http://localhost:8000"
+          newman run tests/api/test_api.postman_collection.json --reporters cli \
+            --env-var "FASTAPI_URL=http://localhost:8000"
