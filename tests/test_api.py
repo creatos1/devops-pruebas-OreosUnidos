@@ -1,12 +1,9 @@
-# tests/test_api.py
-
 import sys
 import os
 
-# Añade la carpeta 'src' al path de Python para que GitHub Actions la encuentre
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
-from main import app  # Importa la app directamente desde src/main.py
+from main import app
 
 from fastapi.testclient import TestClient
 
@@ -30,3 +27,11 @@ def test_get_stock_price_invalid():
     response = client.get("/stock/INVALID")
     assert response.status_code == 404
     assert "Symbol not found" in response.json()["detail"]
+
+
+def test_full_flow():
+    response = client.get("/stock/AAPL")  # Hace la petición al endpoint
+    assert response.status_code == 200  # Verifica que la respuesta sea 200 OK
+    assert (
+        "AAPL" in response.json()["symbol"]
+    )  # Verifica que el JSON tenga el símbolo correcto
