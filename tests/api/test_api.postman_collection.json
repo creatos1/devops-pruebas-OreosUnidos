@@ -1,0 +1,25 @@
+{
+  "name": "Stock API Tests",
+  "item": [
+    {
+      "name": "Get valid stock",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8000/stock/AAPL"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get invalid stock",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8000/stock/INVALID"
+        }
+      },
+      "response": []
+    }
+  ]
+}
