@@ -16,15 +16,20 @@ jobs:
       - name: Instalar dependencias
         run: |
           pip install fastapi uvicorn pytest
-          pip install python-dotenv  # Si usas variables de entorno
+          pip install pytest-cov  # Para cobertura de código
+
+      - name: Añadir src al PYTHONPATH
+        run: |
+          export PYTHONPATH="${PYTHONPATH}:src"
+          echo "PYTHONPATH: $PYTHONPATH"
 
       - name: Ejecutar pruebas unitarias
         run: |
           uvicorn src.main:app --port 8000 --host 0.0.0.0 &
+          sleep 5  # Esperar a que el servidor inicie
           pytest tests/test_api.py --cov=src --cov-report=xml
         env:
           FASTAPI_ENV: test
-
       - name: Ejecutar pruebas funcionales
         run: |
           newman run tests/api/postman/test_api.postman_collection.json --reporters cli
