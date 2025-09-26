@@ -6,41 +6,41 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-  - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-  - name: Configurar Python
-    uses: actions/setup-python@v5
-    with:
-      python-version: '3.9'
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
 
-  - name: Instalar dependencias Python
-    run: |
-      pip install -r requirements.txt
-      pip install pytest-cov
+      - name: Instalar dependencias Python
+        run: |
+          pip install -r requirements.txt
+          pip install pytest-cov
 
-  - name: Instalar Node.js
-    uses: actions/setup-node@v4
-    with:
-      node-version: '18'
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-  - name: Instalar Newman
-    run: npm install -g newman
+      - name: Instalar Newman
+        run: npm install -g newman
 
-  - name: Añadir src al PYTHONPATH
-    run: |
-      export PYTHONPATH="${PYTHONPATH}:src"
-      echo "PYTHONPATH: $PYTHONPATH"
+      - name: Añadir src al PYTHONPATH
+        run: |
+          export PYTHONPATH="${PYTHONPATH}:src"
+          echo "PYTHONPATH: $PYTHONPATH"
 
-  - name: Ejecutar pruebas unitarias
-    run: |
-      uvicorn src.main:app --port 8000 --host 0.0.0.0 &
-      sleep 5
-      pytest tests/test_api.py --cov=src --cov-report=xml
-    env:
-      FASTAPI_ENV: test
+      - name: Ejecutar pruebas unitarias
+        run: |
+          uvicorn src.main:app --port 8000 --host 0.0.0.0 &
+          sleep 5
+          pytest tests/test_api.py --cov=src --cov-report=xml
+        env:
+          FASTAPI_ENV: test
 
-  - name: Ejecutar pruebas funcionales
-    run: |
-      newman run tests/api/test_api.postman_collection.json --reporters cli
-    env:
-      FASTAPI_URL: "http://localhost:8000"
+      - name: Ejecutar pruebas funcionales
+        run: |
+          newman run tests/api/test_api.postman_collection.json --reporters cli
+        env:
+          FASTAPI_URL: "http://localhost:8000"
