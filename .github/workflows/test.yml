@@ -6,31 +6,45 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      # 1. Clonar el repositorio
       - uses: actions/checkout@v4
 
+      # 2. Configurar Python
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
 
+      # 3. Instalar dependencias
       - name: Instalar dependencias
         run: |
           pip install fastapi uvicorn pytest
-          pip install pytest-cov
+          pip install pytest-cov  # Para cobertura de código
 
+      # 4. Añadir src al PYTHONPATH
       - name: Añadir src al PYTHONPATH
         run: |
           export PYTHONPATH="${PYTHONPATH}:src"
           echo "PYTHONPATH: $PYTHONPATH"
 
+      # 5. Verificar estructura del proyecto
+      - name: Verificar archivos
+        run: |
+          ls -la
+          ls -la src/
+          ls -la tests/
+          ls -la tests/api/
+
+      # 6. Ejecutar pruebas unitarias
       - name: Ejecutar pruebas unitarias
         run: |
           uvicorn src.main:app --port 8000 --host 0.0.0.0 &
           sleep 5
-          pytest tests/test_api.py --cov=src --cov-report=xml
+          pytest tests/test_api.py --cov=src --cov-report=xml --tb=short
         env:
           FASTAPI_ENV: test
 
+      # 7. Ejecutar pruebas funcionales (Postman)
       - name: Ejecutar pruebas funcionales
         run: |
           newman run tests/api/test_api.postman_collection.json --reporters cli
