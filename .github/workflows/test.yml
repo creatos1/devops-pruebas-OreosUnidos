@@ -1,0 +1,32 @@
+name: Pruebas Automatizadas
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Instalar dependencias
+        run: |
+          pip install fastapi uvicorn pytest
+          pip install python-dotenv  # Si usas variables de entorno
+
+      - name: Ejecutar pruebas unitarias
+        run: |
+          uvicorn src.main:app --port 8000 --host 0.0.0.0 &
+          pytest tests/test_api.py --cov=src --cov-report=xml
+        env:
+          FASTAPI_ENV: test
+
+      - name: Ejecutar pruebas funcionales
+        run: |
+          newman run tests/api/postman/test_api.postman_collection.json --reporters cli
+        env:
+          FASTAPI_URL: "http://localhost:8000"
