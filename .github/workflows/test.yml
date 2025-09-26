@@ -6,39 +6,31 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    # Variables globales para todo el job
     env:
-      PYTHONPATH: ./src
       FASTAPI_URL: http://localhost:8000
 
     steps:
-      # 1. Clonar el repo
       - uses: actions/checkout@v4
 
-      # 2. Configurar Python
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
 
-      # 3. Instalar dependencias Python
       - name: Instalar dependencias Python
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest-cov httpx
 
-      # 4. Instalar Node.js
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
-      # 5. Instalar Newman
       - name: Instalar Newman
         run: npm install -g newman
 
-      # 6. Levantar Uvicorn en background y esperar a que la API esté lista
       - name: Levantar API (Uvicorn)
         run: |
           uvicorn src.main:app --host 0.0.0.0 --port 8000 &
@@ -51,25 +43,20 @@ jobs:
               sleep 2
             fi
           done
-          # Verificación final
           if ! curl -s --fail $FASTAPI_URL/ >/dev/null 2>&1; then
-            echo "ERROR: La API no respondió en $FASTAPI_URL"
+            echo "ERROR: La API no respondió"
             exit 1
           fi
 
-      # 7. Ejecutar pruebas unitarias (pytest)
-      - name: Pruebas unitarias
-        run: |
-          pytest tests/test_api.py --cov=src --cov-report=xml
+      - name: Ejecutar pruebas unitarias
+        run: pytest tests/test_api.py --cov=src --cov-report=xml
 
-      # 8. Ejecutar pruebas funcionales (Newman)
-      - name: Pruebas funcionales
+      - name: Ejecutar pruebas funcionales
         run: |
           newman run tests/api/test_api.postman_collection.json \
             --reporters cli \
             --env-var "FASTAPI_URL=$FASTAPI_URL"
 
-      # 9. Subir reporte de cobertura como artefacto
       - name: Guardar reporte de cobertura
         uses: actions/upload-artifact@v4
         with:

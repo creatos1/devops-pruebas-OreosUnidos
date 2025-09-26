@@ -1,11 +1,14 @@
+# tests/test_api.py
+
 import sys
 import os
-from main import app
 
+# Añade la carpeta 'src' al path de Python para que GitHub Actions la encuentre
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
+from main import app  # Importa la app directamente desde src/main.py
+
 from fastapi.testclient import TestClient
-from src.main import app
 
 client = TestClient(app)
 
