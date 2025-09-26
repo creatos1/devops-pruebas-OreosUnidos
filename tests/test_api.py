@@ -1,3 +1,9 @@
+import sys
+import os
+from main import app
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
+
 from fastapi.testclient import TestClient
 from src.main import app
 
