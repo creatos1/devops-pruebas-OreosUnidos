@@ -16,7 +16,7 @@ jobs:
       - name: Instalar dependencias
         run: |
           pip install fastapi uvicorn pytest
-          pip install pytest-cov  # Para cobertura de código
+          pip install pytest-cov
 
       - name: Añadir src al PYTHONPATH
         run: |
@@ -30,8 +30,9 @@ jobs:
           pytest tests/test_api.py --cov=src --cov-report=xml
         env:
           FASTAPI_ENV: test
+
       - name: Ejecutar pruebas funcionales
         run: |
-          newman run tests/api/postman/test_api.postman_collection.json --reporters cli
+          newman run tests/api/test_api.postman_collection.json --reporters cli
         env:
           FASTAPI_URL: "http://localhost:8000"
