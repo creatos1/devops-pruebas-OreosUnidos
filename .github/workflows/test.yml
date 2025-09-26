@@ -16,7 +16,7 @@ jobs:
       - name: Instalar dependencias Python
         run: |
           pip install -r requirements.txt
-          pip install pytest-cov
+          pip install pytest-cov httpx
 
       - name: Instalar Node.js
         uses: actions/setup-node@v4
@@ -26,23 +26,38 @@ jobs:
       - name: Instalar Newman
         run: npm install -g newman
 
-      - name: Añadir src al PYTHONPATH
-        run: |
-          export PYTHONPATH="${PYTHONPATH}:src"
-          echo "PYTHONPATH: $PYTHONPATH"
-
       - name: Ejecutar pruebas unitarias
         run: |
           export PYTHONPATH="${PYTHONPATH}:./src"
           uvicorn src.main:app --port 8000 --host 0.0.0.0 &
-          sleep 5
+          # Esperar a que la API esté disponible
+          for i in {1..15}; do
+            if curl -s http://localhost:8000/; then
+              echo "API lista"
+              break
+            else
+              echo "Esperando API..."
+              sleep 2
+            fi
+          done
           pytest tests/test_api.py --cov=src --cov-report=xml
         env:
           FASTAPI_ENV: test
 
-
       - name: Ejecutar pruebas funcionales
         run: |
+          export PYTHONPATH="${PYTHONPATH}:./src"
+          uvicorn src.main:app --port 8000 --host 0.0.0.0 &
+          # Esperar a que la API esté disponible
+          for i in {1..15}; do
+            if curl -s http://localhost:8000/; then
+              echo "API lista"
+              break
+            else
+              echo "Esperando API..."
+              sleep 2
+            fi
+          done
           newman run tests/api/test_api.postman_collection.json --reporters cli
         env:
           FASTAPI_URL: "http://localhost:8000"

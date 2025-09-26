@@ -6,7 +6,9 @@
       "request": {
         "method": "GET",
         "url": {
-          "raw": "http://localhost:8000/stock/AAPL"
+          "raw": "{{FASTAPI_URL}}/stock/AAPL",
+          "host": ["{{FASTAPI_URL}}"],
+          "path": ["stock", "AAPL"]
         }
       },
       "response": []
@@ -16,7 +18,9 @@
       "request": {
         "method": "GET",
         "url": {
-          "raw": "http://localhost:8000/stock/INVALID"
+          "raw": "{{FASTAPI_URL}}/stock/INVALID",
+          "host": ["{{FASTAPI_URL}}"],
+          "path": ["stock", "INVALID"]
         }
       },
       "response": []
