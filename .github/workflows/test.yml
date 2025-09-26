@@ -6,14 +6,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    # Variables a nivel de job: PYTHONPATH para que pytest encuentre src, y URL base para Newman.
+    # PYTHONPATH para que pytest encuentre src
     env:
       PYTHONPATH: ./src
       FASTAPI_URL: http://localhost:8000
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Configurar Python
         uses: actions/setup-python@v5
@@ -26,7 +25,7 @@ jobs:
           pip install -r requirements.txt
           pip install pytest-cov httpx
 
-      - name: Instalar Node.js (para Newman)
+      - name: Instalar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
@@ -34,12 +33,9 @@ jobs:
       - name: Instalar Newman
         run: npm install -g newman
 
-      - name: Levantar Uvicorn (background) y esperar API
+      - name: Levantar Uvicorn y esperar API
         run: |
-          # Levanta la API una sola vez en background
           uvicorn src.main:app --port 8000 --host 0.0.0.0 &
-
-          # Esperar hasta que la API responda en / (timeout ~30s)
           for i in {1..15}; do
             if curl -s --fail http://localhost:8000/ >/dev/null 2>&1; then
               echo "API lista"
@@ -49,26 +45,19 @@ jobs:
               sleep 2
             fi
           done
-
-          # Última verificación
           if ! curl -s --fail http://localhost:8000/ >/dev/null 2>&1; then
-            echo "ERROR: La API no respondió en http://localhost:8000/"
+            echo "ERROR: La API no respondió"
             exit 1
           fi
 
-      - name: Ejecutar pruebas unitarias (pytest)
-        run: |
-          pytest tests/test_api.py --cov=src --cov-report=xml
-        env:
-          FASTAPI_ENV: test
+      - name: Ejecutar pruebas unitarias
+        run: pytest tests/test_api.py --cov=src --cov-report=xml
 
-      - name: Ejecutar pruebas funcionales (Newman)
+      - name: Ejecutar pruebas funcionales
         run: |
-          # Newman recibe la variable FASTAPI_URL explícitamente para asegurar el reemplazo en la colección
           newman run tests/api/test_api.postman_collection.json --reporters cli --env-var "FASTAPI_URL=http://localhost:8000"
 
       - name: Guardar reporte de cobertura
-        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
