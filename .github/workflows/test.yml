@@ -24,13 +24,14 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
-      - name: Instalar proyecto
+      - name: Instalar dependencias y pytest
         run: |
           pip install --upgrade pip
-          pip install -e .
+          pip install -e .      # instala tu app (fastapi, uvicorn, etc.)
+          pip install pytest    # 👈 necesario para ejecutar pytest
       - name: Ejecutar smoke tests
         run: pytest tests/test_smoke.py -v
-
+        
   validate-files:
     runs-on: ubuntu-latest
     steps:
