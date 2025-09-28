@@ -21,21 +21,22 @@ jobs:
 
   # 2. Pruebas unitarias básicas / smoke tests (Prioridad: Alta)
   smoke-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Configurar Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.9'
-      - name: Instalar dependencias
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest
-      - name: Ejecutar smoke tests
-        run: pytest tests/test_smoke.py -v
-
+  runs-on: ubuntu-latest
+  env:
+    PYTHONPATH: ${{ github.workspace }}/src  # 👈 esto es clave
+  steps:
+    - uses: actions/checkout@v4
+    - name: Configurar Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest
+    - name: Ejecutar smoke tests
+      run: pytest tests/test_smoke.py -v
   # 3. Validación de archivos obligatorios (Prioridad: Media)
   validate-files:
     runs-on: ubuntu-latest
