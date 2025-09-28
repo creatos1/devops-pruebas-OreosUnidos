@@ -1,6 +1,8 @@
-# tests/test_smoke.py
-def test_imports():
-    """Smoke test: asegurar que los módulos principales se pueden importar sin errores."""
-    import src.main  # o desde donde esté tu app
+import pytest
+from fastapi.testclient import TestClient
+from src.main import app
 
-    assert src.main.app is not None
+
+@pytest.fixture
+def client():
+    return TestClient(app)
