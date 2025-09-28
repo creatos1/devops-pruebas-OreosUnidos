@@ -1,8 +1,6 @@
-import pytest
-from fastapi.testclient import TestClient
-from src.main import app
+# tests/test_smoke.py
+def test_import_main():
+    """Verifica que la aplicación principal se pueda importar sin errores."""
+    from src.main import app
 
-
-@pytest.fixture
-def client():
-    return TestClient(app)
+    assert app is not None

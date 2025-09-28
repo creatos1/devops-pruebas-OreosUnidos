@@ -1,4 +1,3 @@
-# pyproject.toml
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
@@ -10,4 +9,11 @@ description = "Simple Stock Market API"
 dependencies = [
     "fastapi",
     "uvicorn[standard]",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "httpx",          # requerido por TestClient
+    "pytest-cov",
 ]
