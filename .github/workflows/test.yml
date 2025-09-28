@@ -18,21 +18,20 @@ jobs:
 
   smoke-test:
     runs-on: ubuntu-latest
-    env:
-      PYTHONPATH: ${{ github.workspace }}/src
     steps:
       - uses: actions/checkout@v4
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
-      - name: Instalar dependencias
+      - name: Instalar dependencias y el proyecto
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -e .          # ← Instala tu código en modo editable
           pip install pytest
       - name: Ejecutar smoke tests
         run: pytest tests/test_smoke.py -v
+
 
   validate-files:
     runs-on: ubuntu-latest
