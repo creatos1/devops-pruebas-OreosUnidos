@@ -11,9 +11,5 @@ dependencies = [
     "uvicorn[standard]",
 ]
 
-[project.optional-dependencies]
-test = [
-    "pytest",
-    "httpx",          # requerido por TestClient
-    "pytest-cov",
-]
+[tool.setuptools.package-dir]
+"" = "src"
